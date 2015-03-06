@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<meta id=metaz name="viewport" content="width=device-width, initial-scale=1, user-scalable=0"/>
+<style id=stylez>
+    body {
+        margin: 0;
+    }
+
+    body.fullScreen {
+        transition: background 0.2s;
+        background: rgba(0, 0, 0, 0.9);
+    }
+
+    #popper {
+        width: 100px;
+        height: 100px;
+        margin: -2em auto;
+        background: red;
+        border: 10px solid green;
+        -webkit-transform: translateX(0);
+    }
+
+    #popper.floating {
+        position: absolute;
+        margin: 0;
+    }
+
+    body.fullScreen > #popper {
+        transition: 0.2s;
+        top: 50%;
+        margin-top: -50%;
+        left: 0;
+        width: 100%;
+        height: 60%;
+        box-sizing: border-box;
+    }
+</style>
+<div id=popper></div>
+
+<script>
+    function scrollOffset() {
+        return document.documentElement.clientHeight - window.innerHeight;
+    }
+
+    var poppinator = {
+        el: popper,
+        fullScreen: false,
+        open: function() {
+            var w = this.window = window.open();
+            w.document.write('<!DOCTYPE html>');
+            w.document.close();
+            w.document.head.appendChild(metaz.cloneNode(true));
+            w.document.head.appendChild(stylez.cloneNode(true));
+
+            var popperScreenTop = scrollOffset() + popper.offsetTop;
+            var popperScreenLeft = this.el.offsetLeft;
+
+            w.document.body.appendChild(this.el);
+            this.el.classList.add('floating');
+            this.el.style.top = popperScreenTop + 'px';
+            this.el.style.left = popperScreenLeft + 'px';
+
+            setTimeout(function(){
+                this.el.style.top = '';
+                this.el.style.left = '';
+                this.window.document.body.classList.add('fullScreen');
+            }.bind(this), 0);
+
+            this.fullScreen = true;
+        },
+        close: function() {
+            document.body.appendChild(this.sl);
+            this.window.document.body.classList.remove('fullScreen');
+            this.fullScreen = false;
+        },
+        bind: function() {
+            this.el.addEventListener('click', function() {
+                this[this.fullScreen ? 'close' : 'open']();
+            }.bind(this));
+        }
+    }
+
+    poppinator.bind();
+
+</script>
